@@ -1,0 +1,64 @@
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+# Pass Maven the -s settings.xml switch so it uses your Nexus config & credentials
+variables:
+  MAVEN_OPTS: "-B -s settings.xml"
+
+# Cache local Maven repo between runs for speed
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+    - .m2/repository
+
+# --------------------------------------------------------
+# 1) Build (compile)
+# --------------------------------------------------------
+build:
+  stage: build
+  image: maven:3.8.8-jdk-11
+  script:
+    - echo "📦 Compiling project"
+    - mvn $MAVEN_OPTS compile
+
+# --------------------------------------------------------
+# 2) Test
+# --------------------------------------------------------
+test:
+  stage: test
+  image: maven:3.8.8-jdk-11
+  script:
+    - echo "🔍 Running unit tests"
+    - mvn $MAVEN_OPTS test
+
+# --------------------------------------------------------
+# 3) Package (WAR)
+# --------------------------------------------------------
+package:
+  stage: package
+  image: maven:3.8.8-jdk-11
+  script:
+    - echo "🎁 Packaging WAR"
+    - mvn $MAVEN_OPTS package
+  artifacts:
+    paths:
+      - target/*.war
+    expire_in: 1 day
+
+# --------------------------------------------------------
+# 4) Deploy to Nexus
+# --------------------------------------------------------
+deploy:
+  stage: deploy
+  image: maven:3.8.8-jdk-11
+  script:
+    - echo "🚀 Deploying to Nexus (hosted repo: devops)"
+    - mvn $MAVEN_OPTS deploy \
+      -DaltDeploymentRepository=devops::default::${NEXUS_URL}/content/repositories/devops/
+  only:
+    refs:
+      - master
+      - tags
