@@ -1,0 +1,46 @@
+<settings>
+  <servers>
+    <!-- deploy creds for your "devops" hosted if you push there -->
+    <server>
+      <id>devops</id>
+      <username>asen</username>
+      <password>asen</password>
+    </server>
+  </servers>
+
+  <mirrors>
+    <!-- Mirror *everything* to your Nexus group -->
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>
+      <url>http://54.226.11.103:8081/nexus/content/groups/devops-group/</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>use-nexus</id>
+      <repositories>
+        <repository>
+          <id>nexus</id>
+          <url>http://54.226.11.103:8081/nexus/content/groups/devops-group/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>nexus-plugins</id>
+          <url>http://54.226.11.103:8081/nexus/content/groups/devops-group/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>use-nexus</activeProfile>
+  </activeProfiles>
+</settings>
+
